@@ -184,9 +184,9 @@ int AdcDriverHx711::gain_to_pulse( int gain ) const
                 return 25;
 
             case 64 :
-                return 26;
-            case 32 :
                 return 27;
+            case 32 :
+                return 26;
 
             default :
                 return -1;
