@@ -2,7 +2,7 @@
  * @file adc_driver_hx711.h
  * @author Simon Thür (simon.thur@epfl.ch)
  * @brief Driver for multiple HX711 ADCs (with common clock)
- * @version 0.1
+ * @version 0.2
  * @date 2022-03-04
  *
  * @copyright Copyright (c) 2022
@@ -44,8 +44,17 @@ class AdcDriverHx711
      * @param pins The pins to which the ADC data pins are connected. Notably, the
      *             ADC readings will be read and returned in the same order as the
      *             pins.
+     * @param reset_adc If true, the ADCs will be reset.
+     * @param gain_mode Set the gain of for the ADCs. Note that gains are tied to input
+     *                  input channels. (See corresponding datasheet.)
+     *                      Gain:   Channel
+     *                      - 128   A (Default)
+     *                      - 64    A
+     *                      - 32    B
+     *
      */
-    AdcDriverHx711( int dclk, const Pins& pins );
+    AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc = true,
+                    int gain_mode = 128 );
 
 
     //=================================================================================
@@ -111,6 +120,21 @@ class AdcDriverHx711
      */
     bool set_dclk( int pin, bool force = false );
 
+    /**
+     * @brief Set the gain mode on the HX711 ADC.
+     *
+     * @param gain Set the gain of for the ADCs. Note that gains are tied to input
+     *             input channels. (See corresponding datasheet.)
+     *              Gain:   Channel
+     *              - 128   A (Default)
+     *              - 64    A
+     *              - 32    B
+     *              @note that the configuration will be applied AFTER the next read
+     *              operation.
+     *
+     * @return True if the gain mode was updated.
+     */
+    bool set_gain_mode( int gain );
 
     //=================================================================================
     // ADC interactions
@@ -131,11 +155,19 @@ class AdcDriverHx711
      */
     Measurement read();
 
+    /**
+     * @brief Send Reset signal to ADCs
+     *
+     */
+    void reset();
+
 
   protected:
     int  dclk_;
     Pins pins_;
+    int  gain_mode_;
     // bool data_ready( int pin );
+    int gain_to_pulse( int gain ) const;
 
   private:
     // If the same driver is used in multiple places, it is preferable to use only one

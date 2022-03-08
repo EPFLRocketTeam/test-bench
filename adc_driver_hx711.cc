@@ -2,7 +2,7 @@
  * @file adc_driver_hx711.cc
  * @author Simon Thür (simon.thur@epfl.ch)
  * @brief Driver for multiple HX711 ADCs (with common clock)
- * @version 0.1
+ * @version 0.2
  * @date 2022-03-04
  *
  * @copyright Copyright (c) 2022
@@ -10,6 +10,7 @@
  */
 
 #include <algorithm>
+#include <unistd.h>
 
 #include "adc_driver_hx711.h"
 #include "wiringPi.h"
@@ -18,14 +19,22 @@
 // Constructor
 //=====================================================================================
 
-AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins ) : dclk_( dclk )
+AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc,
+                                int gain_mode )
+    : dclk_( dclk ), gain_mode_( gain_mode )
 {
+    if ( gain_to_pulse( gain_mode_ ) < 0 )
+        gain_mode_ = 128;
     std::unique_copy( pins.begin(), pins.end(), std::back_inserter( pins_ ) );
     wiringPiSetupGpio();
     pinMode( dclk_, OUTPUT );
     for ( auto pin : pins_ )
         {
             pinMode( pin, INPUT );
+        }
+    if ( reset_adc )
+        {
+            reset();
         }
 }
 
@@ -94,6 +103,16 @@ bool AdcDriverHx711::set_dclk( int pin, bool force )
     return false;
 }
 
+bool AdcDriverHx711::set_gain_mode( int gain )
+{
+    if ( gain_to_pulse( gain ) < 0 )
+        {
+            return false;
+        }
+
+    gain_mode_ = gain;
+    return true;
+}
 
 //=====================================================================================
 // ADC interactions
@@ -126,12 +145,45 @@ Measurement AdcDriverHx711::read()
                         }
                 }
         }
-    digitalWrite( dclk_, HIGH );
+
+    // set the gain_mode for the next reading (between 1 and 3 pulses)
+    for ( int i = 0; i < gain_to_pulse( gain_mode_ ) - 24; i++ )
+        {
+            usleep( 0.2 );  // minimum high/low duration is 0.2us, potentially measure
+                            // the frequency and adjust values.
+            digitalWrite( dclk_, HIGH );
+            usleep( 0.2 );
+            digitalWrite( dclk_, LOW );
+        }
     for ( auto& adc_val : measurement )
         {
             // because  24 bit signed value on 32 bit int
             adc_val = adc_val ^ 0x800000;
         }
-    digitalWrite( dclk_, LOW );
     return measurement;
+}
+
+void AdcDriverHx711::reset()
+{
+    digitalWrite( dclk_, HIGH );
+    usleep( 60 );
+    digitalWrite( dclk_, LOW );
+}
+
+
+int AdcDriverHx711::gain_to_pulse( int gain ) const
+{
+    switch ( gain )
+        {
+            case 128 :
+                return 25;
+
+            case 64 :
+                return 26;
+            case 32 :
+                return 27;
+
+            default :
+                return -1;
+        }
 }
