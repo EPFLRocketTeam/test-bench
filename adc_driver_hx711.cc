@@ -129,7 +129,7 @@ bool AdcDriverHx711::data_ready()
 
 Measurement AdcDriverHx711::read()
 {
-    Measurement measurement( 0, pins_.size() );
+    Measurement measurement( pins_.size(), 0 );
     while ( ! data_ready() )
         ;
     for ( int i = 0; i < 24; i++ )
