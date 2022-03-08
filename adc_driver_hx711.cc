@@ -13,7 +13,13 @@
 #include <unistd.h>
 
 #include "adc_driver_hx711.h"
+
+#ifdef TESTENV
+#include "wiringPi_test_env.h"
+#else
 #include "wiringPi.h"
+#endif  // TESTING
+
 
 //=====================================================================================
 // Constructor
