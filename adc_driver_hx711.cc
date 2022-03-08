@@ -130,14 +130,13 @@ bool AdcDriverHx711::data_ready()
 Measurement AdcDriverHx711::read()
 {
     Measurement measurement( pins_.size(), 0 );
-    while ( ! data_ready() )
-        ;
+    while ( ! data_ready() ) usleep( 0.1 );
     for ( int i = 0; i < 24; i++ )
         {
             digitalWrite( dclk_, HIGH );
             for ( int i = 0; i < pins_.size(); i++ )
                 {
-                    measurement[ i ] << 1;
+                    measurement[ i ] = measurement[ i ] << 1;
                     digitalWrite( dclk_, LOW );
                     if ( digitalRead( pins_[ i ] ) )
                         {
@@ -157,8 +156,8 @@ Measurement AdcDriverHx711::read()
         }
     for ( auto& adc_val : measurement )
         {
-            // because  24 bit signed value on 32 bit int
-            adc_val = adc_val ^ 0x800000;
+            // because  24 bit signed value on 32 bit int (sign extend)
+            adc_val = adc_val & 0x800000 ? adc_val | 0xFF000000 : adc_val;
         }
     return measurement;
 }
