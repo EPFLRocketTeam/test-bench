@@ -18,8 +18,10 @@ INC_DIRS ?= $(SRC_DIRS)
 
 # compiler settings
 CXX = g++
-CXXFLAGS = -g -Wall -std=c++17 -MMD -MP $(INC_FLAGS) -lWiringPi
+CXXFLAGS = -g -Wall -std=c++17 -MMD -MP $(INC_FLAGS)
 CXXFLAGS_TEST = -g -Wall -std=c++17 -DTESTENV -MMD -MP $(INC_FLAGS) 
+
+LDLIBS = -lwiringPi
 
 # --------------
 # process vars
@@ -42,7 +44,7 @@ DEPS_TEST := $(OBJS_TEST:.o=.d)
 # --------------
 # build target
 $(TARGET_EXEC): $(ROOT_OBJ) $(OBJS)
-	$(CXX) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDLIBS) -o $@
 
 # run target
 .PHONY: run
@@ -80,7 +82,7 @@ testrun: $(TEST_EXEC)
 
 # build test
 $(TEST_EXEC): $(TEST_OBJ) $(OBJS_TEST)
-	$(CXX) $^ -o $@
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
 # --------------
 # clean (remove build directory)
