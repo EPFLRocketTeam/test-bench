@@ -163,7 +163,7 @@ Measurement AdcDriverHx711::read()
     for ( auto& adc_val : measurement )
         {
             // because  24 bit signed value on 32 bit int (sign extend)
-            adc_val = adc_val & 0x800000 ? adc_val | 0xFF000000 : adc_val;
+            adc_val = (adc_val & 0x800000) ? adc_val | 0xFF000000 : adc_val;
         }
     return measurement;
 }
