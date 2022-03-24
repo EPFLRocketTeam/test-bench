@@ -178,12 +178,7 @@ void AdcDriverHx711::read_zero( int nbr_measurements )
 //=====================================================================================
 bool AdcDriverHx711::data_ready()
 {
-    for ( int pin : pins_ )
-        {
-            if ( ! digitalRead( pin ) )
-                return false;
-        }
-    return true;
+    return std::none_of( pins_.begin(), pins_.end(), digitalRead );
 }
 
 Measurement AdcDriverHx711::read()
