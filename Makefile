@@ -96,11 +96,11 @@ clean:
 
 # -------------
 # cppcheck
-CHECKFLAGS = --std=c++11 --enable=all  --cppcheck-build-dir=build-check/ --includes-file= $(INC_FLAGS)
+CHECKFLAGS = --std=c++11 --enable=all  --cppcheck-build-dir=build-check/  $(INC_FLAGS)
 
 .PHONY: check 
 check: 
-	cppcheck $(CHECKFLAGS) projet.cc src/
+	cppcheck $(CHECKFLAGS) main.cc src/
 
 
 # --------------
