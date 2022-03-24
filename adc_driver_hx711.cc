@@ -2,7 +2,7 @@
  * @file adc_driver_hx711.cc
  * @author Simon Thür (simon.thur@epfl.ch)
  * @brief Driver for multiple HX711 ADCs (with common clock)
- * @version 0.2
+ * @version 0.3
  * @date 2022-03-04
  *
  * @copyright Copyright (c) 2022
@@ -10,6 +10,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <unistd.h>
 
 #include "adc_driver_hx711.h"
@@ -26,7 +27,7 @@
 //=====================================================================================
 
 AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc,
-                                int gain_mode )
+                                int zero_measurements, int gain_mode )
     : dclk_( dclk ), gain_mode_( gain_mode )
 {
     if ( gain_to_pulse( gain_mode_ ) < 0 )
@@ -41,8 +42,31 @@ AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc,
     if ( reset_adc )
         {
             reset();
+            read();  // sets gain-mode
+        }
+    if ( zero_measurements > 0 )
+        {
+            read_zero( zero_measurements );
+        }
+    else
+        {
+            offset_ = Offset( pins_.size(), 0 );
         }
 }
+
+void AdcDriverHx711::offset( const Offset& offset )
+{
+    offset_ = offset;
+    for ( size_t i = offset_.size(); i < pins_.size(); i++ )
+        {
+            offset_.push_back( 0 );
+        }
+    while ( offset_.size() > pins_.size() )
+        {
+            offset_.pop_back();
+        }
+}
+
 
 //=====================================================================================
 // Getters
@@ -54,6 +78,10 @@ const Pins& AdcDriverHx711::pins() const
 int AdcDriverHx711::dclk_pin() const
 {
     return dclk_;
+}
+const Offset& AdcDriverHx711::offset() const
+{
+    return offset_;
 }
 
 
@@ -72,6 +100,7 @@ bool AdcDriverHx711::add_pin( int pin, bool force )
         {
             pinMode( pin, INPUT );
             pins_.push_back( pin );
+            offset_.push_back( 0 );
             return true;
         }
 }
@@ -79,7 +108,7 @@ bool AdcDriverHx711::add_pin( int pin, bool force )
 
 bool AdcDriverHx711::remove_pin( int pin )
 {
-    auto remove = std::remove( pins_.begin(), pins_.end(), pin );
+    auto remove = std::find( pins_.begin(), pins_.end(), pin );
     if ( remove == pins_.end() )
         {
             return false;
@@ -87,6 +116,7 @@ bool AdcDriverHx711::remove_pin( int pin )
     else
         {
             pins_.erase( remove, pins_.end() );
+            offset_.erase( offset_.begin() + std::distance( pins_.begin(), remove ) );
             return true;
         }
 }
@@ -102,6 +132,8 @@ bool AdcDriverHx711::set_dclk( int pin, bool force )
     if ( force )
         {
             pins_.erase( existing_pin );
+            offset_.erase( offset_.begin()
+                           + std::distance( pins_.begin(), existing_pin ) );
             pinMode( pin, OUTPUT );
             return true;
         }
@@ -118,6 +150,27 @@ bool AdcDriverHx711::set_gain_mode( int gain )
 
     gain_mode_ = gain;
     return true;
+}
+
+void AdcDriverHx711::read_zero( int nbr_measurements )
+{
+    if ( nbr_measurements > 0 )
+        {
+            offset_ = Offset( pins_.size(), 0 );
+            Offset offset_sum( pins_.size(), 0 );
+            for ( int cnt = 0; cnt < nbr_measurements; cnt++ )
+                {
+                    Measurement reading = read();
+                    for ( unsigned i = 0; i < pins_.size(); i++ )
+                        {
+                            offset_sum[ i ] += reading[ i ];
+                        }
+                }
+            for ( unsigned i = 0; i < offset_.size(); i++ )
+                {
+                    offset_[ i ] = offset_sum[ i ] / nbr_measurements;
+                }
+        }
 }
 
 //=====================================================================================
@@ -137,10 +190,10 @@ Measurement AdcDriverHx711::read()
 {
     Measurement measurement( pins_.size(), 0 );
     while ( ! data_ready() ) usleep( 0.1 );
-    for ( int i = 0; i < 24; i++ )
+    for ( int cnt = 0; cnt < 24; cnt++ )
         {
             digitalWrite( dclk_, HIGH );
-            for ( int i = 0; i < pins_.size(); i++ )
+            for ( unsigned i = 0; i < pins_.size(); i++ )
                 {
                     measurement[ i ] = measurement[ i ] << 1;
                     digitalWrite( dclk_, LOW );
@@ -160,10 +213,13 @@ Measurement AdcDriverHx711::read()
             usleep( 0.2 );
             digitalWrite( dclk_, LOW );
         }
-    for ( auto& adc_val : measurement )
+    for ( size_t i = 0; i < measurement.size(); i++ )
         {
             // because  24 bit signed value on 32 bit int (sign extend)
-            adc_val = (adc_val & 0x800000) ? adc_val | 0xFF000000 : adc_val;
+            measurement[ i ] = ( measurement[ i ] & 0x800000 )
+                                 ? measurement[ i ] | 0xFF000000
+                                 : measurement[ i ];
+            measurement[ i ] += offset_[ i ];
         }
     return measurement;
 }
