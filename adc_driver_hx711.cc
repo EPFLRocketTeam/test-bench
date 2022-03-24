@@ -39,6 +39,7 @@ AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc,
         {
             pinMode( pin, INPUT );
         }
+    offset_ = Offset( pins_.size(), 0 );
     if ( reset_adc )
         {
             reset();
@@ -47,10 +48,6 @@ AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc,
     if ( zero_measurements > 0 )
         {
             read_zero( zero_measurements );
-        }
-    else
-        {
-            offset_ = Offset( pins_.size(), 0 );
         }
 }
 
