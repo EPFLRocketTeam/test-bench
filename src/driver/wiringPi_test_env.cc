@@ -1,23 +1,18 @@
 /**
- * @file wiringPi_test_env.h
+ * @file wiringPi_test_env.cc
  * @author Simon Thür (simon.thur@epfl.ch)
  * @brief empty functions to replace wiringPi when testing other functionality.
  * @version 0.1
- * @date 2022-03-08
+ * @date 2022-03-11
  *
  * @copyright Copyright (c) 2022
  *
  */
 
-#ifndef WIRINGPI_TEST_ENV_H
-#define WIRINGPI_TEST_ENV_H
 #include <iostream>
 #include <stdlib.h>
 
-#define HIGH   1
-#define LOW    0
-#define OUTPUT 1
-#define INPUT  0
+#include "wiringPi_test_env.h"
 
 
 int wiringPiSetupGpio()
@@ -40,5 +35,3 @@ void digitalWrite( int pin, int val )
 {
     std::cout << "Write pin: " << pin << " value: " << val << std::endl;
 }
-
-#endif  // WIRINGPI_TEST_ENV_H
