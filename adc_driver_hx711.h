@@ -2,7 +2,7 @@
  * @file adc_driver_hx711.h
  * @author Simon Thür (simon.thur@epfl.ch)
  * @brief Driver for multiple HX711 ADCs (with common clock)
- * @version 0.2
+ * @version 0.3
  * @date 2022-03-04
  *
  * @copyright Copyright (c) 2022
@@ -10,8 +10,8 @@
  */
 
 
-#ifndef adc_driver_hx711_h
-#define adc_driver_hx711_h
+#ifndef __ADC_DRIVER_HX711_H
+#define __ADC_DRIVER_HX711_H
 
 #include <vector>
 
@@ -19,7 +19,8 @@
 typedef std::vector<int> Measurement;
 // List of pins
 typedef std::vector<int> Pins;
-
+// List of measuement offset values
+typedef std::vector<int> Offset;
 
 /**
  * @brief Driver for HX711 ADCs connected to the same clock.
@@ -45,6 +46,11 @@ class AdcDriverHx711
      *             ADC readings will be read and returned in the same order as the
      *             pins.
      * @param reset_adc If true, the ADCs will be reset.
+     * @param zero_measurements Number of measurements to be made to average out as
+     *                          zero offset. To forego this step, set measurements to
+     *                          equal 0 (or negative). To set a custom offset, use the
+     *                          method `void AdcDriverHx711::offset( const Offset&
+     *                          offset )`
      * @param gain_mode Set the gain of for the ADCs. Note that gains are tied to input
      *                  input channels. (See corresponding datasheet.)
      *                      Gain:   Channel
@@ -54,7 +60,7 @@ class AdcDriverHx711
      *
      */
     AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc = true,
-                    int gain_mode = 128 );
+                    int zero_measurements = 10, int gain_mode = 128 );
 
 
     //=================================================================================
@@ -73,6 +79,13 @@ class AdcDriverHx711
      * @return int dclk_
      */
     int dclk_pin() const;
+
+    /**
+     * @brief Return current offset values.
+     *
+     * @return const Offset&
+     */
+    const Offset& offset() const;
 
 
     //=================================================================================
@@ -136,6 +149,23 @@ class AdcDriverHx711
      */
     bool set_gain_mode( int gain );
 
+    /**
+     * @brief Set reading offset such that current reading returns 0.
+     *
+     * @param nbr_measurements Number of readings to average over.
+     */
+    void read_zero( int nbr_measurements = 10 );
+
+    /**
+     * @brief set offset. (missing values will be set to 0. Additional values are
+     *        are dropped. The offset value must be in the same order as the
+     *        corresponding pins. offset[0] will be applied to the measurment of
+     *        pin[0].
+     *
+     */
+    void offset( const Offset& offset );
+
+
     //=================================================================================
     // ADC interactions
     //=================================================================================
@@ -163,9 +193,10 @@ class AdcDriverHx711
 
 
   protected:
-    int  dclk_;
-    Pins pins_;
-    int  gain_mode_;
+    int    dclk_;
+    Pins   pins_;
+    Offset offset_;
+    int    gain_mode_;
     // bool data_ready( int pin );
     int gain_to_pulse( int gain ) const;
 
@@ -177,4 +208,4 @@ class AdcDriverHx711
 };
 
 
-#endif  // adc_driver_hx711_h
+#endif  // __ADC_DRIVER_HX711_H
