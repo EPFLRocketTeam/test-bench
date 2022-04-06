@@ -9,8 +9,9 @@
  *
  */
 
-#include <iostream>
 #include <stdlib.h>
+
+#include <iostream>
 
 #include "wiringPi_test_env.h"
 
@@ -19,11 +20,14 @@ int wiringPiSetupGpio()
 {
     return 0;
 }
+int wiringPiSetupPhys()
+{
+    return 0;
+}
 void pinMode( int p1, int p2 )
 {
     std::cout << "Set pinMode: pin " << p1 << " mode: " << p2 << std::endl;
 }
-
 int digitalRead( int p )
 {
     int read_val = rand() > RAND_MAX / 2;

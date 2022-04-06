@@ -9,8 +9,8 @@
  *
  */
 
-#ifndef WIRINGPI_TEST_ENV_H
-#define WIRINGPI_TEST_ENV_H
+#ifndef __WIRINGPI_TEST_ENV_H
+#define __WIRINGPI_TEST_ENV_H
 
 
 #define HIGH   1
@@ -20,8 +20,9 @@
 
 
 int  wiringPiSetupGpio();
+int  wiringPiSetupPhys();
 void pinMode( int p1, int p2 );
 int  digitalRead( int p );
 void digitalWrite( int pin, int val );
 
-#endif  // WIRINGPI_TEST_ENV_H
+#endif  // __WIRINGPI_TEST_ENV_H

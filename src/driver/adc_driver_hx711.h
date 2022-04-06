@@ -10,8 +10,8 @@
  */
 
 
-#ifndef adc_driver_hx711_h
-#define adc_driver_hx711_h
+#ifndef __ADC_DRIVER_HX711_H
+#define __ADC_DRIVER_HX711_H
 
 #include <vector>
 
@@ -208,4 +208,4 @@ class AdcDriverHx711
 };
 
 
-#endif  // adc_driver_hx711_h
+#endif  // __ADC_DRIVER_HX711_H

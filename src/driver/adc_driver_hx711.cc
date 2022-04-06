@@ -9,9 +9,10 @@
  *
  */
 
+#include <unistd.h>
+
 #include <algorithm>
 #include <cmath>
-#include <unistd.h>
 
 #include "adc_driver_hx711.h"
 
@@ -33,7 +34,7 @@ AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc,
     if ( gain_to_pulse( gain_mode_ ) < 0 )
         gain_mode_ = 128;
     std::unique_copy( pins.begin(), pins.end(), std::back_inserter( pins_ ) );
-    wiringPiSetupGpio();
+    wiringPiSetupPhys();
     pinMode( dclk_, OUTPUT );
     for ( auto pin : pins_ )
         {
@@ -165,7 +166,7 @@ void AdcDriverHx711::read_zero( int nbr_measurements )
                 }
             for ( unsigned i = 0; i < offset_.size(); i++ )
                 {
-                    offset_[ i ] = offset_sum[ i ] / nbr_measurements;
+                    offset_[ i ] = -offset_sum[ i ] / nbr_measurements;
                 }
         }
 }
