@@ -16,6 +16,8 @@
 #define DATA_PIN_0 16
 #define DCLK_PIN   23
 
+#define DCLK_PIN 23
+
 int main( int argc, char const* argv[] )
 {
     Pins           adc_input_pins = { DATA_PIN_0 };

@@ -23,9 +23,9 @@
 #endif  // TESTING
 
 
-//=====================================================================================
+//=============================================================================
 // Constructor
-//=====================================================================================
+//=============================================================================
 
 AdcDriverHx711::AdcDriverHx711( int dclk, const Pins& pins, bool reset_adc,
                                 int zero_measurements, int gain_mode )
@@ -66,9 +66,9 @@ void AdcDriverHx711::offset( const Offset& offset )
 }
 
 
-//=====================================================================================
+//=============================================================================
 // Getters
-//=====================================================================================
+//=============================================================================
 const Pins& AdcDriverHx711::pins() const
 {
     return pins_;
@@ -83,14 +83,15 @@ const Offset& AdcDriverHx711::offset() const
 }
 
 
-//=====================================================================================
+//=============================================================================
 // Driver settings
-//=====================================================================================
+//=============================================================================
 bool AdcDriverHx711::add_pin( int pin, bool force )
 {
     if ( ! force
          && ( pin == dclk_
-              || std::find( pins_.begin(), pins_.end(), pin ) != std::end( pins_ ) ) )
+              || std::find( pins_.begin(), pins_.end(), pin )
+                     != std::end( pins_ ) ) )
         {
             return false;
         }
@@ -114,7 +115,8 @@ bool AdcDriverHx711::remove_pin( int pin )
     else
         {
             pins_.erase( remove, pins_.end() );
-            offset_.erase( offset_.begin() + std::distance( pins_.begin(), remove ) );
+            offset_.erase( offset_.begin()
+                           + std::distance( pins_.begin(), remove ) );
             return true;
         }
 }
@@ -171,9 +173,9 @@ void AdcDriverHx711::read_zero( int nbr_measurements )
         }
 }
 
-//=====================================================================================
+//=============================================================================
 // ADC interactions
-//=====================================================================================
+//=============================================================================
 bool AdcDriverHx711::data_ready()
 {
     return std::none_of( pins_.begin(), pins_.end(), digitalRead );
@@ -200,8 +202,8 @@ Measurement AdcDriverHx711::read()
     // set the gain_mode for the next reading (between 1 and 3 pulses)
     for ( int i = 0; i < gain_to_pulse( gain_mode_ ) - 24; i++ )
         {
-            usleep( 0.2 );  // minimum high/low duration is 0.2us, potentially measure
-                            // the frequency and adjust values.
+            usleep( 0.2 );  // minimum high/low duration is 0.2us, potentially
+                            // measure the frequency and adjust values.
             digitalWrite( dclk_, HIGH );
             usleep( 0.2 );
             digitalWrite( dclk_, LOW );
