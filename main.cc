@@ -19,12 +19,14 @@
 #define DATA_PIN_3 22
 #define DATA_PIN_4 29
 #define DATA_PIN_5 32
-#define DCLK_PIN   23
+
+#define DCLK_PIN 23
 
 int main( int argc, char const* argv[] )
 {
-    Pins           adc_input_pins = { DATA_PIN_0, DATA_PIN_1, DATA_PIN_2, DATA_PIN_3,
-                            DATA_PIN_4, DATA_PIN_5, DATA_PIN_5 };
+    Pins adc_input_pins = { DATA_PIN_0, DATA_PIN_1, DATA_PIN_2,
+                            DATA_PIN_3, DATA_PIN_4, DATA_PIN_5 };
+
     AdcDriverHx711 adc_driver( DCLK_PIN, adc_input_pins );
     Measurement    meas = adc_driver.read();
     std::cout << "Measurement:";
