@@ -51,7 +51,8 @@ class AdcDriverHx711
      * negative). To set a custom offset, use the method `void
      * AdcDriverHx711::offset( const Offset& offset )`
      * @param gain_mode Set the gain of for the ADCs. Note that gains are tied
-     * to input input channels. (See corresponding datasheet.) Gain:   Channel
+     * to input input channels. (See corresponding datasheet.)
+     *                      Gain:   Channel
      *                      - 128   A (Default)
      *                      - 64    A
      *                      - 32    B
@@ -84,6 +85,17 @@ class AdcDriverHx711
      * @return const Offset&
      */
     const Offset& offset() const;
+
+    /**
+     * @brief Return current gain mode.
+     *
+     * @return int (See corresponding datasheet.)
+     *                      Gain:   Channel
+     *                      - 128   A (Default)
+     *                      - 64    A
+     *                      - 32    B
+     */
+    int gain_mode() const;
 
 
     //=========================================================================

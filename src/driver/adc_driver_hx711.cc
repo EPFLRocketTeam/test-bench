@@ -81,6 +81,10 @@ const Offset& AdcDriverHx711::offset() const
 {
     return offset_;
 }
+int AdcDriverHx711::gain_mode() const
+{
+    return gain_mode_;
+}
 
 
 //=============================================================================
