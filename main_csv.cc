@@ -64,10 +64,10 @@ int main( int argc, char const* argv[] )
                         return 0;
                         break;
                     case 'r' :
-                        read(
-                            adc_driver,
-                            base_file + std::to_string( meas_nbr++ ) + ".csv",
-                            nbr_of_readings );
+                        read( adc_driver,
+                              base_file + '_' + std::to_string( meas_nbr++ )
+                                  + ".csv",
+                              nbr_of_readings );
                         break;
                     case 'f' :
                         update_file( base_file, meas_nbr );
