@@ -49,8 +49,11 @@ int main( int argc, char const* argv[] )
                             DATA_PIN_3, DATA_PIN_4, DATA_PIN_5 };
 
     AdcDriverHx711 adc_driver( DCLK_PIN, adc_input_pins );
-    print_config( adc_driver, nbr_of_readings );
-    std::cout << "CSV base file name: " << base_file << std::endl;
+
+    std::cout << "Running " __FILE__
+                 "\nIt is suggested to check (p) and edit (e) configuration "
+                 "before starting.\nPress h for help"
+              << std::endl;
 
 
     char action;
@@ -89,7 +92,13 @@ int main( int argc, char const* argv[] )
                         print_help();
                         break;
                     default :
-                        std::cout << std::endl;
+                        std::cout
+                            << "NOT RECOGNIZED, valid inputs are:"
+                               "\n(q)uit, (r)ead, (f)ile settings, "
+                               "(e)dit configuration, "
+                               "(p)rint configuration, (z)ero ADCs, (h)elp"
+                            << std::endl;
+                        ;
                         break;
                 }
         }
@@ -155,9 +164,9 @@ void update_file( std::string& file, unsigned& meas_nbr )
                           << std::endl;
                 break;
         }
-    std::cout << "New configuration:\nFilename: " << new_file
+    std::cout << "\nNew configuration:\nFilename: " << new_file
               << "\nEnumeration: " << new_meas_nbr
-              << "\n\n Would you like to accept changes? y/n\n>> ";
+              << "\n\nWould you like to accept changes? y/n\n>> ";
     std::cin >> choice;
     switch ( choice )
         {
@@ -373,4 +382,33 @@ void zero_adc( AdcDriverHx711& drvr )
                 break;
         }
 }
-void print_help() {}
+
+void print_help()
+{
+    std::cout << "q: Quit cli"
+                 "\n"
+                 "r: Read ADC values $(NBR) times and write to "
+                 "$(FILENAME)_$(RNBR++).csv"
+                 "\n"
+                 "f: Edit file related data: $(FILENAME) and $(RNBR)"
+                 "\n"
+                 "e: Edit driver configuration (one after the other in order):"
+                 "\n"
+                 "   - $(NBR): How many measurements to make per reading"
+                 "\n"
+                 "   - Gain mode at which to operate"
+                 "\n"
+                 "   - Clock pin (DCLK)"
+                 "\n"
+                 "   - Pin(s) to remove"
+                 "\n"
+                 "   - Pin(s) to append"
+                 "\n"
+                 "p: Print current driver and file configurations"
+                 "\n"
+                 "z: Read current values and set as zero"
+                 "\n"
+                 "h: prints out this help message"
+              << std::endl;
+    ;
+}
