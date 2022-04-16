@@ -74,6 +74,7 @@ int main( int argc, char const* argv[] )
                         break;
                     case 'e' :
                         edit_config( adc_driver, nbr_of_readings );
+                        print_config( adc_driver, nbr_of_readings );
                         break;
                     case 'p' :
 
@@ -220,12 +221,11 @@ void edit_config( AdcDriverHx711& drvr, unsigned& measurements_per_reading )
                          "\n>> ";
             do
                 {
-                    "\nEnter gain mode\n>> ";
                     std::cin >> new_gain;
                     std::cout << "Do you want to accept gain mode " << new_gain
                               << "? y/n\n>> ";
                     std::cin >> choice;
-                    if ( choice = 'y' )
+                    if ( choice == 'y' )
                         {
                             valid = drvr.set_gain_mode( new_gain );
                             if ( ! valid )
