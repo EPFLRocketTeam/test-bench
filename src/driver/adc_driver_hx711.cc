@@ -127,6 +127,7 @@ bool AdcDriverHx711::set_dclk( int pin, bool force )
     if ( existing_pin == pins_.end() )
         {
             pinMode( pin, OUTPUT );
+            dclk_ = pin;
             return true;
         }
     if ( force )
@@ -134,6 +135,7 @@ bool AdcDriverHx711::set_dclk( int pin, bool force )
             pins_.erase( existing_pin );
             offset_.erase( offset_.begin()
                            + std::distance( pins_.begin(), existing_pin ) );
+            dclk_ = pin;
             pinMode( pin, OUTPUT );
             return true;
         }
