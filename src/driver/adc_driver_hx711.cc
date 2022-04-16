@@ -114,7 +114,7 @@ bool AdcDriverHx711::remove_pin( int pin )
         }
     else
         {
-            pins_.erase( remove, pins_.end() );
+            pins_.erase( remove );
             offset_.erase( offset_.begin()
                            + std::distance( pins_.begin(), remove ) );
             return true;
