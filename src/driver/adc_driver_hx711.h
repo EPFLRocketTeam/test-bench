@@ -157,7 +157,7 @@ class AdcDriverHx711
     /**
      * @brief set offset. (missing values will be set to 0. Additional values
      * are are dropped. The offset value must be in the same order as the
-     *        corresponding pins. offset[0] will be applied to the measurment
+     *        corresponding pins. offset[0] will be applied to the measurement
      * of pin[0].
      *
      */
