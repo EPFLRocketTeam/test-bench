@@ -179,8 +179,8 @@ void edit_config( AdcDriverHx711& drvr, unsigned& measurements_per_reading )
     unsigned new_measurements_per_reading = 0;
     int      new_clock                    = 0;
     int      new_gain                     = 0;
-    Pins     add_pins                     = {};
-    Pins     rm_pins                      = {};
+    int      add_pin                      = 0;
+    int      rm_pin                       = 0;
     bool     valid                        = true;
     std::cout << "Do you wish to change the number of measurements per "
                  "reading? y/n\n>> ";
@@ -216,7 +216,8 @@ void edit_config( AdcDriverHx711& drvr, unsigned& measurements_per_reading )
                          " * Gain:   Channel\n"
                          " * 128     A( Default )\n"
                          " * 64      A\n"
-                         " * 32      B ";
+                         " * 32      B "
+                         "\n>> ";
             do
                 {
                     "\nEnter gain mode\n>> ";
@@ -228,9 +229,10 @@ void edit_config( AdcDriverHx711& drvr, unsigned& measurements_per_reading )
                         {
                             valid = drvr.set_gain_mode( new_gain );
                             if ( ! valid )
-                                std::cout << new_gain
-                                          << " was not a valid argument"
-                                          << std::endl;
+                                std::cout
+                                    << new_gain
+                                    << " was not a valid argument. Enter the "
+                                       "desired gain mode\n>> ";
                             else
                                 std::cout << "Gain mode updated" << std::endl;
                         }
@@ -263,10 +265,11 @@ void edit_config( AdcDriverHx711& drvr, unsigned& measurements_per_reading )
                             if ( ! valid )
                                 {
                                     std::cout << "Something went wrong, "
-                                                 "attempt to force? y/n";
+                                                 "attempt to force? y/n\n>> ";
                                     std::cin >> choice;
                                     if ( choice == 'y' )
-                                        drvr.set_dclk( new_clock, true );
+                                        valid =
+                                            drvr.set_dclk( new_clock, true );
                                 }
                             if ( valid )
                                 std::cout << "Clock was updated" << std::endl;
@@ -282,6 +285,75 @@ void edit_config( AdcDriverHx711& drvr, unsigned& measurements_per_reading )
                 }
             while ( ! valid );
         }
+    bool more_input = true;
+    do
+        {
+            std::cout << "Currently the following data pins are in use:\n";
+            for ( auto p : drvr.pins() ) std::cout << p << std::endl;
+            std::cout << "Do you wish to remove a data pin? y/n\n>> ";
+            std::cin >> choice;
+            if ( choice == 'y' )
+                {
+                    std::cout << "Which pin would you like to remove?\n>> ";
+                    std::cin >> rm_pin;
+                    std::cout << "Remove pin " << rm_pin << "? y/n\n>> ";
+                    std::cin >> choice;
+                    if ( choice == 'y' )
+                        if ( drvr.remove_pin( rm_pin ) )
+                            std::cout << "pin " << rm_pin << " removed"
+                                      << std::endl;
+                        else
+                            std::cout << "Failed to remove pin " << rm_pin
+                                      << std::endl;
+                    else
+                        std::cout << "Change discarded" << std::endl;
+                }
+            else
+                more_input = false;
+        }
+    while ( more_input );
+    more_input = true;
+    do
+        {
+            std::cout << "Current data pins are\n";
+            for ( auto p : drvr.pins() ) std::cout << p << std::endl;
+            std::cout << "Do you wish to add a pin? y/n\n>> ";
+            std::cin >> choice;
+            if ( choice == 'y' )
+                {
+                    std::cout << "Enter the pin to add\n>> ";
+                    std::cin >> add_pin;
+                    std::cout << "Add pin " << add_pin << "? y/n\n>> ";
+                    std::cin >> choice;
+                    if ( choice == 'y' )
+                        {
+                            bool success = drvr.add_pin( add_pin );
+                            if ( success )
+                                {
+                                    std::cout << "Pin " << add_pin
+                                              << " appended" << std::endl;
+                                    continue;
+                                }
+                            std::cout << "Failed to add pin " << add_pin
+                                      << ", do you wish to force? y/n\n>> ";
+                            std::cin >> choice;
+                            if ( choice == 'y' )
+                                if ( drvr.add_pin( add_pin, true ) )
+                                    std::cout << "Pin" << add_pin
+                                              << " appended " << std::endl;
+                                else
+                                    std::cout << "Failed to add pin "
+                                              << add_pin << std::endl;
+                            else
+                                std::cout << "Change discarded" << std::endl;
+                        }
+                    else
+                        std::cout << "Change discarded" << std::endl;
+                }
+            else
+                more_input = false;
+        }
+    while ( more_input );
 }
 void zero_adc( AdcDriverHx711& drvr )
 {
