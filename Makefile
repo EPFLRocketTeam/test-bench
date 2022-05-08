@@ -77,7 +77,7 @@ $(BUILD_DIR_TEST)/%.cc.o: %.cc
 
 $(BUILD_DIR_CSV)/%.cc.o: %.cc
 	@$(MKDIR_P) $(dir $@)
-	$(CXX) $(CXXFLAGS_TEST) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
 # --------------
