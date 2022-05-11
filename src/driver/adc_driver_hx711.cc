@@ -208,10 +208,7 @@ Measurement AdcDriverHx711::read()
     // set the gain_mode for the next reading (between 1 and 3 pulses)
     for ( int i = 0; i < gain_to_pulse( gain_mode_ ) - 24; i++ )
         {
-            usleep( 0.2 );  // minimum high/low duration is 0.2us, potentially
-                            // measure the frequency and adjust values.
             digitalWrite( dclk_, HIGH );
-            usleep( 0.2 );
             digitalWrite( dclk_, LOW );
         }
     for ( size_t i = 0; i < measurement.size(); i++ )
