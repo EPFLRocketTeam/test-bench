@@ -17,8 +17,8 @@
 #include "adc_driver_hx711.h"
 
 
-#define DATA_PIN_0 11
-#define DATA_PIN_1 26
+#define DATA_PIN_0 16
+#define DATA_PIN_1 11
 #define DATA_PIN_2 18
 #define DATA_PIN_3 22
 #define DATA_PIN_4 29
