@@ -99,8 +99,9 @@ testrun: $(TEST_EXEC)
 $(TEST_EXEC): $(TEST_OBJ) $(OBJS_TEST)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-
 csv: $(CSV_EXEC)
+
+csvrun: $(CSV_EXEC)
 	@$<
 
 $(CSV_EXEC): $(CSV_OBJ) $(OBJS_CSV)
